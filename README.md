@@ -35,4 +35,4 @@ While primarily a personal collection, suggestions for improvements or new exerc
 
 ## License
 
-This project is licensed under the terms of the **MIT License**. You can find the full license text in the `LICENSE` file (you would need to create this file and add the MIT license text to it).
+This project is licensed under the terms of the **MIT License**. You can find the full license text in the `LICENSE` file.
