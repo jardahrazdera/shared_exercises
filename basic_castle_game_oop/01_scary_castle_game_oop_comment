@@ -1,0 +1,153 @@
+# --- Class Definition: Blueprint for Room objects ---
+class Room:
+    # --- Constructor Method (__init__) ---
+    # This method is automatically called when a new Room object is created (instantiated).
+    # 'self' refers to the specific instance of the Room being created.
+    # 'name' and 'description' are arguments passed during creation.
+    def __init__(self, name, description):
+        # --- Attribute Initialization ---
+        # Assign the provided 'name' to the 'name' attribute of this Room instance.
+        self.name = name
+        # Assign the provided 'description' to the 'description' attribute of this Room instance.
+        self.description = description
+        # Initialize the 'exits' attribute as an empty dictionary for this Room instance.
+        # It will store {'direction': room_object} pairs.
+        self.exits = {}
+
+    # --- Method Definition: add_exit ---
+    # Defines a behavior (method) for Room objects: adding an exit.
+    # 'self' refers to the Room instance this method is called on.
+    # 'direction' (string) and 'room' (another Room object) are arguments.
+    def add_exit(self, direction, room):
+        # Add a new key-value pair to the 'exits' dictionary attribute of this instance.
+        # The key is the direction (string), the value is the connected Room object.
+        self.exits[direction] = room
+
+# --- Class Definition: Blueprint for Player objects ---
+class Player:
+    # --- Constructor Method (__init__) ---
+    # Initializes a new Player object.
+    # 'self' refers to the Player instance being created.
+    # 'name' (string) and 'starting_room' (a Room object) are arguments.
+    def __init__(self, name, starting_room):
+        # --- Attribute Initialization ---
+        # Assign the provided 'name' to the 'name' attribute of this Player instance.
+        self.name = name
+        # Assign the provided 'starting_room' object to the 'room' attribute of this Player instance.
+        # This attribute holds the Room object where the player currently is.
+        self.room = starting_room
+
+    # --- Method Definition: move ---
+    # Defines the player's movement behavior.
+    # 'self' refers to the Player instance this method is called on.
+    # 'direction' (string) is the argument indicating where to move.
+    def move(self, direction):
+        # Check if the provided 'direction' exists as a key in the 'exits' dictionary
+        # of the Room object currently stored in the player's 'room' attribute.
+        if direction in self.room.exits:
+            # --- Attribute Modification ---
+            # If the exit exists, update the player's 'room' attribute.
+            # Assign the Room object associated with that direction (from the current room's exits)
+            # as the player's new current room.
+            self.room = self.room.exits[direction]
+            # Print a confirmation message about the movement.
+            print(f"You move {direction}.")
+        else:
+            # If the direction is not a valid key in the current room's exits dictionary.
+            print("You can't go that way!")
+
+# --- Initial Game Setup ---
+# Print a welcome message to the player.
+print("Welcome to the Scary Castle Game!\n"
+      "If you want to quit during the game,\n"
+      "you can type 'quit', 'exit' or 'q'.\n")
+
+# --- Object Instantiation: Creating Room Instances ---
+# Create an instance (object) of the Room class named 'hall'. Pass arguments to the constructor.
+hall = Room("hall", "This is the main hall of the scary castle.")
+# Create an instance of the Room class named 'kitchen'.
+kitchen = Room("kitchen", "Hmm, creapy smoky castle kitchen.")
+# Create an instance of the Room class named 'dining_room'.
+dining_room = Room("dining Room", "This is the old castle dining room.")
+# Create an instance of the Room class named 'secret_room'.
+secret_room = Room("secret Room", "You are in the scary secret room. Guess what's next?")
+# Create an instance of the Room class named 'outside'.
+outside = Room("outside", "Breeth deaply and find the way to the castle.")
+# Create an instance of the Room class named 'treasure_room' (the goal).
+treasure_room = Room("treasure Room", "Wow! You found the treasure room!")
+
+# --- Object Interaction: Linking Rooms via Methods ---
+# Call the 'add_exit' method on the 'hall' object to link it to 'secret_room' via 'west'.
+hall.add_exit("west", secret_room)
+# Call the 'add_exit' method on the 'secret_room' object to link back to 'hall' via 'east'.
+secret_room.add_exit("east", hall)
+
+# Link 'hall' and 'dining_room'.
+hall.add_exit("east", dining_room)
+dining_room.add_exit("west", hall)
+
+# Link 'hall' and 'kitchen'.
+hall.add_exit("south", kitchen)
+kitchen.add_exit("north", hall)
+
+# Link 'hall' and 'outside'.
+hall.add_exit("north", outside)
+outside.add_exit("south", hall)
+
+# Link 'secret_room' and 'treasure_room'.
+secret_room.add_exit("west", treasure_room)
+treasure_room.add_exit("east", secret_room)
+
+# --- Object Instantiation: Creating the Player Instance ---
+# Create an instance (object) of the Player class.
+# Pass the player's name and the starting Room object ('hall') to the constructor.
+player = Player("Player", hall)
+
+# --- Main Game Loop ---
+# Start an infinite loop that keeps the game running until explicitly stopped (using 'break').
+while True:
+    # --- Accessing Object Attributes for Output ---
+    # Print the 'name' attribute of the Room object currently stored in 'player.room'.
+    print(f"\nYou are in {player.room.name}")
+    # Print the 'description' attribute of the Room object currently stored in 'player.room'.
+    print(player.room.description)
+
+    # --- Accessing and Processing Object Attributes ---
+    # Get the keys (directions) from the 'exits' dictionary of the player's current room.
+    # '.keys()' returns a view object, ', '.join(...) converts them into a comma-separated string.
+    available_exits = ", ".join(player.room.exits.keys())
+    # Print the available exits.
+    print(f"Available exits are: {available_exits}")
+
+    # --- User Input ---
+    # Prompt the user for input, convert it to lowercase, and remove leading/trailing whitespace.
+    command = input(">>>").lower().strip()
+
+    # --- Command Processing ---
+    # Check if the entered command is one of the ways to quit the game.
+    if command == "quit" or command == "exit" or command == "q":
+        print("Goodbye, thanks for playing!")
+        # Exit the 'while True' loop, ending the game.
+        break
+    # Check if the entered command is a valid key (direction) in the 'exits' dictionary
+    # of the player's current Room object ('player.room').
+    elif command in player.room.exits:
+        # --- Calling Object Method ---
+        # Call the 'move' method on the 'player' object, passing the valid command (direction).
+        player.move(command)
+
+        # --- Win Condition Check ---
+        # Compare the player's current room object ('player.room') with the 'treasure_room' object.
+        # This checks if the player has entered the winning room AFTER moving.
+        if player.room == treasure_room:
+            # If the player is in the treasure room, print the winning message.
+            print("Congratulations! You found the treasure room. You win!\n"
+                  "May be you rich now, but not enough smart yet :)\n")
+            # Exit the 'while True' loop, ending the game.
+            break
+    # If the command was not 'quit'/'exit'/'q' and not a valid exit direction.
+    else:
+        print("I don't understand that command or you can't go that way.\n")
+
+# --- End of Script ---
+# (The script finishes when the loop is broken)
